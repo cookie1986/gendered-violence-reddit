@@ -1,0 +1,1 @@
+NUM_POSTS = 1
