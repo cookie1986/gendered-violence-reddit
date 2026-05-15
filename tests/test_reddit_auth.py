@@ -1,5 +1,5 @@
 import praw
-from src.client import get_reddit
+from src.extraction.client import get_reddit
 
 def test_reddit_connection():
     reddit = get_reddit()
