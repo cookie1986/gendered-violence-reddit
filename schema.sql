@@ -26,28 +26,26 @@ CREATE TABLE IF NOT EXISTS posts (
 CREATE TABLE IF NOT EXISTS comments (
     id BIGSERIAL PRIMARY KEY,
     reddit_id TEXT NOT NULL UNIQUE,
-    post_reddit_id TEXT NOT NULL,
-    parent_id TEXT,
+    post_id TEXT NOT NULL,
     author TEXT,
     body_raw TEXT,
     score INTEGER,
     created_utc TIMESTAMPTZ,
-    permalink TEXT,
     fetched_at TIMESTAMPTZ DEFAULT NOW(),
 
-    FOREIGN KEY (post_reddit_id)
+    FOREIGN KEY (post_id)
         REFERENCES posts (reddit_id)
         ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS idx_posts_subreddit_created
-ON posts (subreddit, created_utc);
+ON posts (subreddit_name, created_utc);
 
 CREATE INDEX IF NOT EXISTS idx_comments_post_id
 ON comments (post_id);
 
 CREATE INDEX IF NOT EXISTS idx_comments_parent_id
-ON comments (parent_id);
+ON comments (post_id);
 
 CREATE INDEX IF NOT EXISTS idx_raw_reddit_items_raw_json
 ON raw_reddit_items USING GIN (raw_json);
