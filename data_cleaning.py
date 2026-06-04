@@ -1,6 +1,6 @@
 import pandas as pd
 from src.queries.get_posts_and_comments import query_all_posts, query_all_comments
-from src.cleaning.text_cleaning import clean_text
+from src.cleaning.text_cleaning import clean_text, dtype_string
 
 # query db and return all posts
 posts = query_all_posts()
@@ -20,9 +20,16 @@ posts_df = pd.DataFrame(posts, columns=[
 # remove duplicates based on reddit_post_id
 posts_df = posts_df.drop_duplicates(subset=["reddit_post_id"])
 
+# check text fields are strings and convert if necessary
+posts_df["title_raw"] = posts_df["title_raw"].apply(dtype_string)
+posts_df["selftext_raw"] = posts_df["selftext_raw"].apply(dtype_string)
+
 # clean post title text and selftext text
 posts_df["title_clean"] = posts_df["title_raw"].apply(clean_text)
 posts_df["selftext_clean"] = posts_df["selftext_raw"].apply(clean_text)
+
+# drop the raw text columns
+posts_df = posts_df.drop(columns=["title_raw", "selftext_raw"])
 
 # save cleaned posts to csv
 posts_df.to_csv("data/cleaned/posts.csv", index=False)
@@ -46,8 +53,14 @@ comments_df = pd.DataFrame(comments, columns=[
     "created_utc"
 ])
 
+# check text fields are strings and convert if necessary
+comments_df["body_raw"] = comments_df["body_raw"].apply(dtype_string)
+
 # clean comment body text
 comments_df["body_clean"] = comments_df["body_raw"].apply(clean_text)
+
+# drop the raw text columns
+comments_df = comments_df.drop(columns=["body_raw"])
 
 # save cleaned comments to csv
 comments_df.to_csv("data/cleaned/comments.csv", index=False)
