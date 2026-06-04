@@ -5,3 +5,4 @@ notes/
 .env
 reddit_posts/
 notebooks/
+*egg-info/
