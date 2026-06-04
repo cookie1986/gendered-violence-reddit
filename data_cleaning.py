@@ -1,6 +1,7 @@
 import pandas as pd
-from src.queries.get_posts_and_comments import query_all_posts, query_all_comments
-from src.cleaning.text_cleaning import clean_text, dtype_string
+from queries.get_posts_and_comments import query_all_posts, query_all_comments
+from cleaning.text_cleaning import clean_text, dtype_string
+from cleaning.data_cleaning import delete_empty_rows, remove_automoderator_comments
 
 # query db and return all posts
 posts = query_all_posts()
@@ -19,6 +20,9 @@ posts_df = pd.DataFrame(posts, columns=[
 
 # remove duplicates based on reddit_post_id
 posts_df = posts_df.drop_duplicates(subset=["reddit_post_id"])
+
+# delete empty rows in title_raw
+posts_df = delete_empty_rows(posts_df, "title_raw")
 
 # check text fields are strings and convert if necessary
 posts_df["title_raw"] = posts_df["title_raw"].apply(dtype_string)
@@ -52,6 +56,12 @@ comments_df = pd.DataFrame(comments, columns=[
     "comment_score",
     "created_utc"
 ])
+
+# remove comments by AutoModerator
+comments_df = remove_automoderator_comments(comments_df)
+
+# remove empty rows in body_raw
+comments_df = delete_empty_rows(comments_df, "body_raw")
 
 # check text fields are strings and convert if necessary
 comments_df["body_raw"] = comments_df["body_raw"].apply(dtype_string)
